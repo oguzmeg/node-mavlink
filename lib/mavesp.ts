@@ -46,9 +46,14 @@ export class MavEsp8266 extends EventEmitter {
 
     // Create the reader as usual by piping the source stream through the splitter
     // and packet parser
-    const reader = this.input.pipe(splitter).pipe(parser).pipe(ftp);
-
-    reader.on("data", this.processIncomingPacket);
+    let reader;
+    if (splitter && parser) {
+      reader = this.input.pipe(splitter).pipe(parser);
+      reader.on("data", this.processIncomingPacket);
+    } else if (splitter && parser && ftp) {
+      reader = this.input.pipe(splitter).pipe(parser).pipe(ftp);
+      reader.on("data", this.processIncomingPacket);
+    }
   }
 
   /**
